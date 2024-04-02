@@ -1,7 +1,8 @@
 import streamlit as st
 from gtts import gTTS
-import os
 from googletrans import Translator
+import requests
+import os
 
 # Custom CSS
 custom_css = """
@@ -98,16 +99,20 @@ def main():
     # Translate text when button is clicked
     if translate_button_clicked:
         if text:
-            translator = Translator()
-            translated_text = translator.translate(text, dest=languages[lang]).text
-            st.text_area("Translated Text", value=translated_text, height=150)
+            try:
+                translator = Translator()
+                translated_text = translator.translate(text, dest=languages[lang]).text
+                st.text_area("Translated Text", value=translated_text, height=150)
 
-            # Convert translated text to audio
-            tts_translated = gTTS(translated_text, lang='en')  # Use 'en' for English
-            with st.spinner("Converting translated text to audio..."):
-                output_file_translated = "output_translated.mp3"
-                tts_translated.save(output_file_translated)
-            st.audio(output_file_translated, format="audio/mp3", start_time=0)
+                # Convert translated text to audio
+                tts_translated = gTTS(translated_text, lang='en')  # Use 'en' for English
+                with st.spinner("Converting translated text to audio..."):
+                    output_file_translated = "output_translated.mp3"
+                    tts_translated.save(output_file_translated)
+                st.audio(output_file_translated, format="audio/mp3", start_time=0)
+            except Exception as e:
+                st.error("Translation failed. Please try again later.")
+                print(e)
 
 if __name__ == "__main__":
     main()
